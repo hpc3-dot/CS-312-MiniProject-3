@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/style.css" type="text/css">
+    <title>Blog Project</title>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="hero">
+            </div>
+        </header>
+        <main class="main">
+        <% if (typeof registered !== 'undefined' && registered) { %>
+            <script>
+                alert("Account created successfully, sign in to continue.");
+            </script>
+        <% } %>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <script>
+                alert("Error creating account. Please try again.");
+            </script>
+        <% } %>
+          <% if (typeof loginError !== 'undefined' && loginError) { %>
+            <script>
+                alert("Invalid username or password. Please try again.");
+            </script>
+        <% } %>
+        <div class="login">
+            <h1>You must first login or create an account to proceed.</h1>
+            <h2>Login</h2>
+            <form action="/login" method="POST">
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <button type="submit">Login</button>
+            </form>
+          </div>
+          <div class="create-account">
+            <h2>Create Account</h2>
+            <form action="/register" method="POST">
+                <input type="text" id="fullName" name="fullName" placeholder="Enter your Full name" required>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                <textarea id="bio" name="bio" placeholder="Enter your bio" required></textarea>
+                <input type="text" id="username" name="username" placeholder="Create your username" required>
+                <input type="password" id="password" name="password" placeholder="Create your password" required>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+
+                <button type="submit">Create Account</button>
+            </form>
+        </div>
+        </main>
+        <script src="index.js"></script>
+</body>
+</html>

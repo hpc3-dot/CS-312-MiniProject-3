@@ -14,8 +14,20 @@
         </header>
         <div class="about-api-container">
             <div class="about">
+                <div class="about-blog">
                     <h2>About This Blog</h2>
                     <p>This blog was created for everyone to share their experience fly-fishing. It was inspired by my love of fishing, and hearing about other peoples' eyes light up when they are telling the story of the "Big One" they hooked!</p>
+                </div>
+                <div class="logged-in">
+                    <h2>Welcome, <%= locals.username %></h2>
+                    <form action="/logout" method="GET">
+                        <button type="submit">Logout</button>
+                    </form>
+                     <form action="/account" method="GET">
+                        <button type="submit">Edit Account</button>
+                    </form>
+
+                </div>
             </div>
             <div class="forecast">
                 <h1>Check the weather before your next trip!</h1>
@@ -59,11 +71,10 @@
         <main class="main">
             <div class="new-blog-post">
                 <h2>Create New Blog Post</h2>
-                <form action="/submit" method="POST">
-                    <input type="text" id="uName" name="uName" placeholder="Enter your name" required>    
-                    <input type="text" id="postTitle" name="postTitle" placeholder="Enter blog post title" required>
-                    <textarea id="postContent" name="postContent" placeholder="Enter blog post content" required></textarea>
-                    <select id="fishType" name="fishType">
+                <form action="/submit" method="POST">  
+                    <input type="text" id="title" name="title" placeholder="Enter blog post title" required>
+                    <textarea id="body" name="body" placeholder="Enter blog post content" required></textarea>
+                    <select id="fish_type" name="fish_type">
                         <option value="">Select a fish type</option>
                         <option value="rtrout">Rainbow Trout</option>
                         <option value="btrout">Brown Trout</option>
@@ -74,11 +85,12 @@
                 </form>
 
             <div class="filter">
-                <h3>Filter posts by the fish that was caught!</h3>
-                <form action="/filter" method="GET">
+                <h3>Filter posts by the fish!</h3>
+                <form action="/home" method="GET">
                     
                     <select id="fishType" name="fishType">
                         <option value="all">All</option>
+                        <option value="userPosts">My Posts</option>
                         <option value="rtrout">Rainbow Trout</option>
                         <option value="btrout">Brown Trout</option>
                         <option value="brtrout">Brook Trout</option>
@@ -91,78 +103,80 @@
             </div>
             <div class="blog-posts">
                 <% if (locals.blogposts && locals.blogposts.length > 0) { %>
-                    <% locals.blogposts.forEach(function(blogpost) { %>
-                        <% if (blogpost.edit === true) { %> 
-                            <% switch (blogpost.fishType) { 
-                            case 'rtrout': %>
-                                <div class="blog-card" style="background-image: url('/public/images/rainbow.png');">
-                            <% break; 
-                            
-                            case 'btrout': %>
-                                <div class="blog-card" style="background-image: url('/public/images/brown.png');">
-                            <% break; 
-                            case 'brtrout': %>
-                                <div class="blog-card" style="background-image: url('/public/images/brook.png');">
-                            <% break; 
-                            case 'other': %>
-                                <div class="blog-card" style="background-image: url('/public/images/creek_bed.png');">
-                            <% break; default: %>
-                                <div class="blog-card" style="background-image: url('/public/images/creek_bed.png');">
-                            <% } %>
-                               <form action="/update" method="POST">
-                                    <input type="text" id="editPostName" name="postName" value="<%= blogpost.uName %>" required>
-                                    <input type="text" id="editPostTitle" name="postTitle" value="<%= blogpost.postTitle %>" required>
-                                    <textarea id="editPostContent" name="postContent" required><%= blogpost.postContent %></textarea>
-                                    <select id="fishType" name="fishType">
-                                        <option value="">Select a fish type</option>
-                                        <option value="rtrout">Rainbow Trout</option>
-                                        <option value="btrout">Brown Trout</option>
-                                        <option value="brtrout">Brook Trout</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                    <input type="hidden" name="id" value="<%= blogpost.id %>"> 
-                                    <button type="submit">Save Changes</button>  
-                                </form>
-                                <form action="/cancel" method="POST">
-                                    <input type="hidden" name="id" value="<%= blogpost.id %>">
-                                    <button type="submit">Cancel Changes</button>
-                                </form>
-                            </div>
-                   
-                        <% } else { %>
-                           <% switch (blogpost.fishType) { 
-                            case 'rtrout': %>
-                                <div class="blog-card" style="background-image: url('/public/images/rainbow.png');">
-                            <% break; 
-                            
-                            case 'btrout': %>
-                                <div class="blog-card" style="background-image: url('/public/images/brown.png');">
-                            <% break; 
-                            case 'brtrout': %>
-                                <div class="blog-card" style="background-image: url('/public/images/brook.png');">
-                            <% break; 
-                            case 'other': %>
-                                <div class="blog-card" style="background-image: url('/public/images/creek_bed.png');">
-                            <% break; default: %>
-                                <div class="blog-card" style="background-image: url('/public/images/creek_bed.png');">
-                            <% } %>
-                                <h3><%= blogpost.postTitle %></h3>
-                                <p><%= blogpost.postContent %></p>
-                                <p><em>By <%= blogpost.uName %> on <%= blogpost.date %></em></p> 
-                                <div class="blog-buttons">
-                                    <form action="/edit" method="POST">
-                                    <input type="hidden" name="id" value="<%= blogpost.id %>">
-                                    <button type="submit">Edit</button>
+                   <% if (edit && editPostId) { %>
+                            <% locals.blogposts.filter(post => String(post.blog_id) === String(editPostId)).forEach(function(blogpost) { %>
+                                <% switch (blogpost.fish_type) { 
+                                case 'rtrout': %>
+                                    <div class="blog-card" style="background-image: url('/public/images/rainbow.png');">
+                                <% break; 
+                                
+                                case 'btrout': %>
+                                    <div class="blog-card" style="background-image: url('/public/images/brown.png');">
+                                <% break; 
+                                case 'brtrout': %>
+                                    <div class="blog-card" style="background-image: url('/public/images/brook.png');">
+                                <% break; 
+                                case 'other': %>
+                                    <div class="blog-card" style="background-image: url('/public/images/creek_bed.png');">
+                                <% break; default: %>
+                                    <div class="blog-card" style="background-image: url('/public/images/creek_bed.png');">
+                                <% } %>
+                                <form action="/updatePost" method="POST">
+                                        <input type="text" id="editPostTitle" name="postTitle" value="<%= blogpost.title %>" required>
+                                        <textarea id="editPostContent" name="postContent" required><%= blogpost.body %></textarea>
+                                        <select id="fish_type" name="fish_type">
+                                            <option value="">Select a fish type</option>
+                                            <option value="rtrout">Rainbow Trout</option>
+                                            <option value="btrout">Brown Trout</option>
+                                            <option value="brtrout">Brook Trout</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                        <input type="hidden" name="id" value="<%= blogpost.blog_id %>"> 
+                                        <button type="submit">Save Changes</button>  
                                     </form>
-                                    <form action="/delete" method="POST">
-                                    <input type="hidden" name="id" value="<%= blogpost.id %>">
-                                    <button type="submit">Delete</button>
+                                    <form action="/cancel" method="POST">
+                                        <input type="hidden" name="id" value="<%= blogpost.blog_id %>">
+                                        <button type="submit">Cancel Changes</button>
                                     </form>
-                                    
                                 </div>
-                            </div>
-                        <% } %>
-                    <% }); %>
+                            <% }); %>
+                        <% } else { %>
+                         <% locals.blogposts.forEach(function(blogpost) { %>
+                            <% switch (blogpost.fish_type) { 
+                                case 'rtrout': %>
+                                    <div class="blog-card" style="background-image: url('/public/images/rainbow.png');">
+                                <% break; 
+                                
+                                case 'btrout': %>
+                                    <div class="blog-card" style="background-image: url('/public/images/brown.png');">
+                                <% break; 
+                                case 'brtrout': %>
+                                    <div class="blog-card" style="background-image: url('/public/images/brook.png');">
+                                <% break; 
+                                case 'other': %>
+                                    <div class="blog-card" style="background-image: url('/public/images/creek_bed.png');">
+                                <% break; default: %>
+                                    <div class="blog-card" style="background-image: url('/public/images/creek_bed.png');">
+                                <% } %>
+                                    <h3><%= blogpost.title %></h3>
+                                    <p><%= blogpost.body %></p>
+                                    <p><em>By <%= blogpost.creator_name %> on <%= blogpost.date_created %></em></p> 
+                                    <div class="blog-buttons">
+                                        <form action="/edit" method="POST">
+                                        <input type="hidden" name="id" value="<%= blogpost.blog_id %>">
+                                        <input type="hidden" name="creator_user_id" value="<%= blogpost.creator_user_id %>">
+                                        <button type="submit">Edit</button>
+                                        </form>
+                                        <form action="/delete" method="POST">
+                                        <input type="hidden" name="id" value="<%= blogpost.blog_id %>">
+                                        <input type="hidden" name="creator_user_id" value="<%= blogpost.creator_user_id %>">
+                                        <button type="submit">Delete</button>
+                                        </form>
+                                        
+                                    </div>
+                                </div>
+                                 <% }); %>
+                            <% } %>    
                 <% } else { %>
                     <p>No blog posts yet.</p>
                 <% } %>
@@ -177,3 +191,12 @@
     <script src="index.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+                        
